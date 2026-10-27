@@ -64,10 +64,10 @@
     </small>
 
     <label>2. Character Details (Hair, Eyes, Clothes)</label>
-    <input type="text" id="characterFeatures" placeholder="e.g. young boy, messy black hair, tired dark eyes, school uniform">
+    <input type="text" id="characterFeatures" placeholder="young anime boy, messy black hair, pale skin, white shirt">
 
     <label>3. Scene Action / Background</label>
-    <textarea id="scenePrompt" placeholder="e.g. standing in dark foggy haunted corridor, holding a candle"></textarea>
+    <textarea id="scenePrompt" placeholder="standing in dark foggy haunted corridor, holding a glowing candle, close up shot"></textarea>
 
     <div class="row">
       <div class="col">
@@ -84,14 +84,14 @@
   </div>
 
   <div id="preview-area">
-    <div id="loading" class="loading-spinner">Generating Horror Scene... Kripya thoda intezar karein.</div>
+    <div id="loading" class="loading-spinner">Generating 2D Anime Scene... Kripya 10-15 second intezar karein.</div>
     <img id="generatedImage" src="" alt="AI Horror Output" style="display:none;">
-    <a id="downloadLink" href="#" download="horror_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
+    <a id="downloadLink" href="#" download="horror_anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
   </div>
 
   <script>
     function randomizeSeed() {
-      document.getElementById('seedInput').value = Math.floor(Math.random() * 900000) + 100000;
+      document.getElementById('seedInput').value = Math.floor(Math.random() * 899999) + 100000;
     }
     randomizeSeed();
 
@@ -108,18 +108,19 @@
         return alert("Kripya Scene ya Character ka description likhein.");
       }
 
-      const stylePreset = "2D dark anime horror style, Junji Ito aesthetic, retro 90s anime screenshot, eerie dark shadows, dramatic horror lighting, high quality, masterpiece";
+      // Strict 2D Dark Anime prompt engineering
+      const stylePreset = "masterpiece, 2d hand drawn anime illustration, dark horror anime aesthetic, classic 90s horror anime screencap, sharp clean ink lineart, dark gothic shadows, atmospheric eerie lighting, flat 2d anime cel shading";
       const fullPrompt = `${charFeatures}, ${sceneAction}, ${stylePreset}`;
       
-      let width = 1280;
-      let height = 720;
+      let width = 1024;
+      let height = 576;
 
       if (ratio === "9:16") {
-        width = 720;
-        height = 1280;
-      } else if (ratio === "1:1") {
-        width = 1024;
+        width = 576;
         height = 1024;
+      } else if (ratio === "1:1") {
+        width = 768;
+        height = 768;
       }
 
       const previewArea = document.getElementById('preview-area');
@@ -129,12 +130,16 @@
 
       previewArea.style.display = "flex";
       loading.style.display = "block";
-      loading.innerText = "Generating Horror Scene... Kripya 10-15 second intezar karein.";
+      loading.innerText = "Generating 2D Anime Scene... Kripya 10-15 second intezar karein.";
       img.style.display = "none";
       downloadLink.style.display = "none";
 
-      const encodedPrompt = encodeURIComponent(fullPrompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
+      const cleanPrompt = encodeURIComponent(fullPrompt);
+      
+      // Negative prompt logic to completely ban 3D/realistic photos
+      const negativePrompt = encodeURIComponent("3d, realistic, photo, photograph, render, cgi, western comic, blurry");
+      
+      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?negative=${negativePrompt}&width=${width}&height=${height}&seed=${seed}&nologo=true&enhance=false&_t=${Date.now()}`;
 
       const tempImg = new Image();
       tempImg.src = imageUrl;
@@ -148,7 +153,7 @@
       };
 
       tempImg.onerror = () => {
-        loading.innerText = "Server busy hai, kripya 5 second baad dobara 'Generate' dabayein.";
+        loading.innerText = "Server busy hai, kripya dobara try karein.";
       };
     }
   </script>
