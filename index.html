@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Horror Anime Studio - Face Consistency</title>
+  <title>Horror Anime AI Creator</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #0d0d0f; color: #e6e6e6; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
@@ -60,14 +60,14 @@
       <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
     </div>
     <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px;">
-      Same character ke liye is number ko badalna mat. Naya banda chahiye toh 'New Face' dabayein.
+      Same character ke liye is number ko mat badalna. Naya character chahiye toh 'New Face' dabayein.
     </small>
 
     <label>2. Character Details (Hair, Eyes, Clothes)</label>
-    <input type="text" id="characterFeatures" placeholder="e.g. 18 year old boy, messy black hair, tired dark eyes, school uniform">
+    <input type="text" id="characterFeatures" placeholder="e.g. young boy, messy black hair, tired dark eyes, school uniform">
 
     <label>3. Scene Action / Background</label>
-    <textarea id="scenePrompt" placeholder="e.g. looking at a bloody mirror inside a dark abandoned hallway, fog, creepy shadows"></textarea>
+    <textarea id="scenePrompt" placeholder="e.g. standing in dark foggy haunted corridor, holding a candle"></textarea>
 
     <div class="row">
       <div class="col">
@@ -90,7 +90,6 @@
   </div>
 
   <script>
-    // Initial random seed
     function randomizeSeed() {
       document.getElementById('seedInput').value = Math.floor(Math.random() * 900000) + 100000;
     }
@@ -98,17 +97,18 @@
 
     function generateHorrorScene() {
       const seed = document.getElementById('seedInput').value || 123456;
-      const charFeatures = document.getElementById('characterFeatures').value.trim();
-      const sceneAction = document.getElementById('scenePrompt').value.trim();
+      let charFeatures = document.getElementById('characterFeatures').value.trim();
+      let sceneAction = document.getElementById('scenePrompt').value.trim();
       const ratio = document.getElementById('aspectRatio').value;
+
+      charFeatures = charFeatures.replace(/[()]/g, '');
+      sceneAction = sceneAction.replace(/[()]/g, '');
 
       if (!sceneAction && !charFeatures) {
         return alert("Kripya Scene ya Character ka description likhein.");
       }
 
-      // Pre-set Dark Horror Anime Style Prompt
-      const stylePreset = "dark horror anime style, 2d animation aesthetic, eerie atmosphere, Junji Ito inspired, terrifying shadows, cinematic horror lighting, highly detailed line art, masterpiece";
-      
+      const stylePreset = "2D dark anime horror style, Junji Ito aesthetic, retro 90s anime screenshot, eerie dark shadows, dramatic horror lighting, high quality, masterpiece";
       const fullPrompt = `${charFeatures}, ${sceneAction}, ${stylePreset}`;
       
       let width = 1280;
@@ -129,12 +129,12 @@
 
       previewArea.style.display = "flex";
       loading.style.display = "block";
+      loading.innerText = "Generating Horror Scene... Kripya 10-15 second intezar karein.";
       img.style.display = "none";
       downloadLink.style.display = "none";
 
-      // Direct free Pollinations engine with locked seed
       const encodedPrompt = encodeURIComponent(fullPrompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=flux`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
       const tempImg = new Image();
       tempImg.src = imageUrl;
@@ -148,7 +148,7 @@
       };
 
       tempImg.onerror = () => {
-        loading.innerText = "Error aaya, kripya dobara generate dabayein.";
+        loading.innerText = "Server busy hai, kripya 5 second baad dobara 'Generate' dabayein.";
       };
     }
   </script>
