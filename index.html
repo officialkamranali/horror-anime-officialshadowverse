@@ -5,77 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Horror Anime AI Creator</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
     body { background: #0d0d0f; color: #e6e6e6; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
     header { text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #222; }
-    h1 { font-size: 20px; color: #ff3b30; text-transform: uppercase; letter-spacing: 1px; }
+    h1 { font-size: 20px; color: #ff3b30; text-transform: uppercase; }
     p.sub { font-size: 12px; color: #888; margin-top: 4px; }
-    
     .card { background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; margin-bottom: 15px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #bbb; }
-    
-    input, textarea, select {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
-      background: #232328; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
-    }
+    input, textarea, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #232328; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px; }
     textarea { resize: vertical; min-height: 80px; }
-    
     .row { display: flex; gap: 10px; }
     .col { flex: 1; }
-
-    button {
-      width: 100%; padding: 14px; border: none; border-radius: 8px;
-      background: #ff3b30; color: #fff; font-size: 15px; font-weight: bold;
-      cursor: pointer; transition: 0.2s;
-    }
-    button:active { background: #d32f2f; }
+    button { width: 100%; padding: 14px; border: none; border-radius: 8px; background: #ff3b30; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; }
+    button:disabled { background: #555; cursor: not-allowed; }
     button.sec-btn { background: #333; padding: 10px; font-size: 13px; margin-top: -6px; margin-bottom: 12px; }
-
-    #preview-area {
-      display: none; flex-direction: column; align-items: center; justify-content: center;
-      background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; text-align: center;
-    }
-    #generatedImage {
-      width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #444; margin-bottom: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-    }
+    #preview-area { display: none; flex-direction: column; align-items: center; justify-content: center; background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; text-align: center; }
+    #generatedImage { width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #444; margin-bottom: 12px; }
     .loading-spinner { font-size: 14px; color: #ff9500; margin: 15px 0; }
-    .download-btn {
-      background: #007aff; text-decoration: none; color: #fff; padding: 12px 20px;
-      border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;
-    }
+    .download-btn { background: #007aff; text-decoration: none; color: #fff; padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Horror Anime AI Creator</h1>
-    <p class="sub">Face Consistent 2D Dark Anime Generator for YouTube Stories</p>
+    <p class="sub">Face Consistent 2D Dark Anime Generator</p>
   </header>
 
   <div class="card">
-    <label>1. Character Face Lock (Consistency Seed)</label>
+    <label>1. Face Lock Seed</label>
     <div class="row">
-      <input type="number" id="seedInput" placeholder="Character Seed (Jaise: 12345)" class="col">
+      <input type="number" id="seedInput" placeholder="12345" class="col">
       <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
     </div>
-    <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px;">
-      Same character ke liye is number ko mat badalna. Naya character chahiye toh 'New Face' dabayein.
-    </small>
 
-    <label>2. Character Details (Hair, Eyes, Clothes)</label>
-    <input type="text" id="characterFeatures" placeholder="young anime boy, messy black hair, pale skin, white shirt">
+    <label>2. Character Details</label>
+    <input type="text" id="characterFeatures" placeholder="young anime boy, messy hair, pale skin">
 
-    <label>3. Scene Action / Background</label>
-    <textarea id="scenePrompt" placeholder="standing in dark foggy haunted corridor, holding a glowing candle, close up shot"></textarea>
+    <label>3. Scene / Background</label>
+    <textarea id="scenePrompt" placeholder="standing in dark foggy haunted corridor, holding candle"></textarea>
 
     <div class="row">
       <div class="col">
         <label>Aspect Ratio</label>
         <select id="aspectRatio">
           <option value="16:9">YouTube Video (16:9)</option>
-          <option value="9:16">Shorts / Reels (9:16)</option>
-          <option value="1:1">Square (1:1)</option>
+          <option value="9:16">Shorts (9:16)</option>
         </select>
       </div>
     </div>
@@ -84,9 +59,9 @@
   </div>
 
   <div id="preview-area">
-    <div id="loading" class="loading-spinner">Generating 2D Anime Scene... Kripya 10-15 second intezar karein.</div>
-    <img id="generatedImage" src="" alt="AI Horror Output" style="display:none;">
-    <a id="downloadLink" href="#" download="horror_anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
+    <div id="loading" class="loading-spinner">Generating 2D Anime Scene...</div>
+    <img id="generatedImage" src="" alt="AI Output" style="display:none;">
+    <a id="downloadLink" href="#" download="anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
   </div>
 
   <script>
@@ -95,33 +70,34 @@
     }
     randomizeSeed();
 
+    function setCooldown(btn) {
+      let seconds = 45;
+      btn.disabled = true;
+      const interval = setInterval(() => {
+        btn.innerText = `Wait ${seconds}s for next scene`;
+        seconds--;
+        if (seconds < 0) {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.innerText = "⚡ Generate Scene";
+        }
+      }, 1000);
+    }
+
     function generateHorrorScene() {
+      const btn = document.getElementById('genBtn');
       const seed = document.getElementById('seedInput').value || 123456;
-      let charFeatures = document.getElementById('characterFeatures').value.trim();
-      let sceneAction = document.getElementById('scenePrompt').value.trim();
+      let charFeatures = document.getElementById('characterFeatures').value.trim().replace(/[()]/g, '');
+      let sceneAction = document.getElementById('scenePrompt').value.trim().replace(/[()]/g, '');
       const ratio = document.getElementById('aspectRatio').value;
 
-      charFeatures = charFeatures.replace(/[()]/g, '');
-      sceneAction = sceneAction.replace(/[()]/g, '');
+      if (!sceneAction && !charFeatures) return alert("Details bharein.");
 
-      if (!sceneAction && !charFeatures) {
-        return alert("Kripya Scene ya Character ka description likhein.");
-      }
-
-      // Strict 2D Dark Anime prompt engineering
-      const stylePreset = "masterpiece, 2d hand drawn anime illustration, dark horror anime aesthetic, classic 90s horror anime screencap, sharp clean ink lineart, dark gothic shadows, atmospheric eerie lighting, flat 2d anime cel shading";
+      const stylePreset = "2d anime illustration, dark horror aesthetic, retro 90s anime screencap, inked outlines, flat cel shading";
       const fullPrompt = `${charFeatures}, ${sceneAction}, ${stylePreset}`;
       
-      let width = 1024;
-      let height = 576;
-
-      if (ratio === "9:16") {
-        width = 576;
-        height = 1024;
-      } else if (ratio === "1:1") {
-        width = 768;
-        height = 768;
-      }
+      let width = 1024, height = 576;
+      if (ratio === "9:16") { width = 576; height = 1024; }
 
       const previewArea = document.getElementById('preview-area');
       const img = document.getElementById('generatedImage');
@@ -130,16 +106,14 @@
 
       previewArea.style.display = "flex";
       loading.style.display = "block";
-      loading.innerText = "Generating 2D Anime Scene... Kripya 10-15 second intezar karein.";
+      loading.innerText = "Generating 2D Anime Scene...";
       img.style.display = "none";
       downloadLink.style.display = "none";
 
+      setCooldown(btn);
+
       const cleanPrompt = encodeURIComponent(fullPrompt);
-      
-      // Negative prompt logic to completely ban 3D/realistic photos
-      const negativePrompt = encodeURIComponent("3d, realistic, photo, photograph, render, cgi, western comic, blurry");
-      
-      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?negative=${negativePrompt}&width=${width}&height=${height}&seed=${seed}&nologo=true&enhance=false&_t=${Date.now()}`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=turbo&_t=${Date.now()}`;
 
       const tempImg = new Image();
       tempImg.src = imageUrl;
@@ -153,7 +127,7 @@
       };
 
       tempImg.onerror = () => {
-        loading.innerText = "Server busy hai, kripya dobara try karein.";
+        loading.innerText = "Error, timer khatam hone par dubara dabayein.";
       };
     }
   </script>
