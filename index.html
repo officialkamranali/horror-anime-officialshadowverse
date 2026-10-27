@@ -3,65 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Horror Anime AI Creator</title>
+  <title>Horror Anime Studio</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-    body { background: #0d0d0f; color: #e6e6e6; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
-    header { text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #222; }
-    h1 { font-size: 20px; color: #ff3b30; text-transform: uppercase; }
-    p.sub { font-size: 12px; color: #888; margin-top: 4px; }
-    .card { background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; margin-bottom: 15px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #bbb; }
-    input, textarea, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #232328; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px; }
-    textarea { resize: vertical; min-height: 80px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0c0c0e; color: #fff; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
+    header { text-align: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #222; }
+    h1 { font-size: 20px; color: #ff3333; text-transform: uppercase; letter-spacing: 1px; }
+    p.sub { font-size: 11px; color: #888; margin-top: 3px; }
+    
+    .card { background: #16161a; border-radius: 12px; padding: 14px; border: 1px solid #282830; margin-bottom: 15px; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #bbb; text-transform: uppercase; }
+    
+    input, textarea, select {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
+      background: #202026; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
+    }
+    textarea { resize: vertical; min-height: 75px; }
+    
     .row { display: flex; gap: 10px; }
     .col { flex: 1; }
-    button { width: 100%; padding: 14px; border: none; border-radius: 8px; background: #ff3b30; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #555; cursor: not-allowed; }
-    button.sec-btn { background: #333; padding: 10px; font-size: 13px; margin-top: -6px; margin-bottom: 12px; }
-    #preview-area { display: none; flex-direction: column; align-items: center; justify-content: center; background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; text-align: center; }
-    #generatedImage { width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #444; margin-bottom: 12px; }
-    .loading-spinner { font-size: 14px; color: #ff9500; margin: 15px 0; }
-    .download-btn { background: #007aff; text-decoration: none; color: #fff; padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; }
+
+    button {
+      width: 100%; padding: 14px; border: none; border-radius: 8px;
+      background: #ff3333; color: #fff; font-size: 15px; font-weight: bold;
+      cursor: pointer; transition: 0.2s;
+    }
+    button:active { background: #cc1111; }
+    button.sec-btn { background: #2c2c34; padding: 10px; font-size: 12px; margin-top: -6px; margin-bottom: 12px; }
+
+    #preview-area {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      background: #16161a; border-radius: 12px; padding: 15px; border: 1px solid #282830; text-align: center;
+    }
+    #generatedImage {
+      width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #3a3a44; margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+    .loading-spinner { font-size: 13px; color: #ff9900; margin: 15px 0; font-weight: 500; }
+    .download-btn {
+      background: #007aff; text-decoration: none; color: #fff; padding: 11px 20px;
+      border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Horror Anime AI Creator</h1>
-    <p class="sub">Face Consistent 2D Dark Anime Generator</p>
+    <h1>Horror Anime Studio</h1>
+    <p class="sub">2D Dark Anime Generator (YouTube Horror Stories)</p>
   </header>
 
   <div class="card">
-    <label>1. Face Lock Seed</label>
+    <label>1. Face Lock / Identity Seed</label>
     <div class="row">
-      <input type="number" id="seedInput" placeholder="12345" class="col">
+      <input type="number" id="seedInput" placeholder="Seed (e.g. 48291)" class="col">
       <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
     </div>
+    <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px; font-size: 11px;">
+      Same character ke liye number wahi rakhein. Naye bhoot/character ke liye 'New Face' dabayein.
+    </small>
 
-    <label>2. Character Details</label>
-    <input type="text" id="characterFeatures" placeholder="young anime boy, messy hair, pale skin">
+    <label>2. Character (Optional)</label>
+    <input type="text" id="characterFeatures" placeholder="e.g. young anime boy, black messy hair, pale skin (Khali chhod sakte hain)">
 
-    <label>3. Scene / Background</label>
-    <textarea id="scenePrompt" placeholder="standing in dark foggy haunted corridor, holding candle"></textarea>
+    <label>3. Scene / Ghost / Background</label>
+    <textarea id="scenePrompt" placeholder="e.g. scary ghost woman in white saree floating in dark haunted forest, red eyes, fog"></textarea>
 
     <div class="row">
       <div class="col">
         <label>Aspect Ratio</label>
         <select id="aspectRatio">
           <option value="16:9">YouTube Video (16:9)</option>
-          <option value="9:16">Shorts (9:16)</option>
+          <option value="9:16">Shorts / Reels (9:16)</option>
+          <option value="1:1">Square (1:1)</option>
         </select>
       </div>
     </div>
 
-    <button id="genBtn" onclick="generateHorrorScene()">⚡ Generate Scene</button>
+    <button id="genBtn" onclick="generateScene()">⚡ Generate Horror Scene</button>
   </div>
 
   <div id="preview-area">
-    <div id="loading" class="loading-spinner">Generating 2D Anime Scene...</div>
-    <img id="generatedImage" src="" alt="AI Output" style="display:none;">
-    <a id="downloadLink" href="#" download="anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
+    <div id="loading" class="loading-spinner">Generating 2D Horror Scene... Kripya 10-15 second intezar karein.</div>
+    <img id="generatedImage" src="" alt="Horror Scene" style="display:none;">
+    <a id="downloadLink" href="#" download="horror_anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
   </div>
 
   <script>
@@ -70,34 +95,35 @@
     }
     randomizeSeed();
 
-    function setCooldown(btn) {
-      let seconds = 45;
-      btn.disabled = true;
-      const interval = setInterval(() => {
-        btn.innerText = `Wait ${seconds}s for next scene`;
-        seconds--;
-        if (seconds < 0) {
-          clearInterval(interval);
-          btn.disabled = false;
-          btn.innerText = "⚡ Generate Scene";
-        }
-      }, 1000);
-    }
-
-    function generateHorrorScene() {
-      const btn = document.getElementById('genBtn');
+    async function generateScene() {
       const seed = document.getElementById('seedInput').value || 123456;
-      let charFeatures = document.getElementById('characterFeatures').value.trim().replace(/[()]/g, '');
-      let sceneAction = document.getElementById('scenePrompt').value.trim().replace(/[()]/g, '');
+      let charFeatures = document.getElementById('characterFeatures').value.trim();
+      let sceneAction = document.getElementById('scenePrompt').value.trim();
       const ratio = document.getElementById('aspectRatio').value;
 
-      if (!sceneAction && !charFeatures) return alert("Details bharein.");
+      if (!sceneAction && !charFeatures) {
+        return alert("Kripya Scene ya Bhoot/Character ka description likhein.");
+      }
 
-      const stylePreset = "2d anime illustration, dark horror aesthetic, retro 90s anime screencap, inked outlines, flat cel shading";
-      const fullPrompt = `${charFeatures}, ${sceneAction}, ${stylePreset}`;
+      // Hardcore 2D Horror Anime Preset (Junji Ito + Retro 90s horror anime)
+      const animePreset = "2D dark anime horror style, hand drawn cel shading, retro 90s dark anime screenshot, creepy terrifying atmosphere, dark shadows, masterpiece, high quality illustration";
       
-      let width = 1024, height = 576;
-      if (ratio === "9:16") { width = 576; height = 1024; }
+      let fullPrompt = "";
+      if (charFeatures) {
+        fullPrompt = `${charFeatures}, ${sceneAction}, ${animePreset}`;
+      } else {
+        fullPrompt = `${sceneAction}, ${animePreset}`;
+      }
+
+      let width = 1024;
+      let height = 576;
+      if (ratio === "9:16") {
+        width = 576;
+        height = 1024;
+      } else if (ratio === "1:1") {
+        width = 768;
+        height = 768;
+      }
 
       const previewArea = document.getElementById('preview-area');
       const img = document.getElementById('generatedImage');
@@ -106,16 +132,17 @@
 
       previewArea.style.display = "flex";
       loading.style.display = "block";
-      loading.innerText = "Generating 2D Anime Scene...";
+      loading.innerText = "Generating 2D Horror Scene... Kripya 10-15 second intezar karein.";
       img.style.display = "none";
       downloadLink.style.display = "none";
 
-      setCooldown(btn);
-
       const cleanPrompt = encodeURIComponent(fullPrompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=turbo&_t=${Date.now()}`;
+
+      // Stable Diffusion anime unmetered direct render
+      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&enhance=false&model=midjourney&_t=${Date.now()}`;
 
       const tempImg = new Image();
+      tempImg.crossOrigin = "anonymous";
       tempImg.src = imageUrl;
 
       tempImg.onload = () => {
@@ -127,7 +154,13 @@
       };
 
       tempImg.onerror = () => {
-        loading.innerText = "Error, timer khatam hone par dubara dabayein.";
+        // Fallback route agar pehla server slow ho
+        const fallbackUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&_t=${Date.now()}`;
+        img.src = fallbackUrl;
+        downloadLink.href = fallbackUrl;
+        loading.style.display = "none";
+        img.style.display = "block";
+        downloadLink.style.display = "inline-block";
       };
     }
   </script>
