@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Horror Anime Studio - Face Consistency</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0d0d0f; color: #e6e6e6; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
+    header { text-align: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #222; }
+    h1 { font-size: 20px; color: #ff3b30; text-transform: uppercase; letter-spacing: 1px; }
+    p.sub { font-size: 12px; color: #888; margin-top: 4px; }
+    
+    .card { background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; margin-bottom: 15px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #bbb; }
+    
+    input, textarea, select {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
+      background: #232328; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    
+    .row { display: flex; gap: 10px; }
+    .col { flex: 1; }
+
+    button {
+      width: 100%; padding: 14px; border: none; border-radius: 8px;
+      background: #ff3b30; color: #fff; font-size: 15px; font-weight: bold;
+      cursor: pointer; transition: 0.2s;
+    }
+    button:active { background: #d32f2f; }
+    button.sec-btn { background: #333; padding: 10px; font-size: 13px; margin-top: -6px; margin-bottom: 12px; }
+
+    #preview-area {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      background: #18181c; border-radius: 12px; padding: 15px; border: 1px solid #2a2a30; text-align: center;
+    }
+    #generatedImage {
+      width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #444; margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+    .loading-spinner { font-size: 14px; color: #ff9500; margin: 15px 0; }
+    .download-btn {
+      background: #007aff; text-decoration: none; color: #fff; padding: 12px 20px;
+      border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Horror Anime AI Creator</h1>
+    <p class="sub">Face Consistent 2D Dark Anime Generator for YouTube Stories</p>
+  </header>
+
+  <div class="card">
+    <label>1. Character Face Lock (Consistency Seed)</label>
+    <div class="row">
+      <input type="number" id="seedInput" placeholder="Character Seed (Jaise: 12345)" class="col">
+      <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
+    </div>
+    <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px;">
+      Same character ke liye is number ko badalna mat. Naya banda chahiye toh 'New Face' dabayein.
+    </small>
+
+    <label>2. Character Details (Hair, Eyes, Clothes)</label>
+    <input type="text" id="characterFeatures" placeholder="e.g. 18 year old boy, messy black hair, tired dark eyes, school uniform">
+
+    <label>3. Scene Action / Background</label>
+    <textarea id="scenePrompt" placeholder="e.g. looking at a bloody mirror inside a dark abandoned hallway, fog, creepy shadows"></textarea>
+
+    <div class="row">
+      <div class="col">
+        <label>Aspect Ratio</label>
+        <select id="aspectRatio">
+          <option value="16:9">YouTube Video (16:9)</option>
+          <option value="9:16">Shorts / Reels (9:16)</option>
+          <option value="1:1">Square (1:1)</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="genBtn" onclick="generateHorrorScene()">⚡ Generate Scene</button>
+  </div>
+
+  <div id="preview-area">
+    <div id="loading" class="loading-spinner">Generating Horror Scene... Kripya thoda intezar karein.</div>
+    <img id="generatedImage" src="" alt="AI Horror Output" style="display:none;">
+    <a id="downloadLink" href="#" download="horror_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
+  </div>
+
+  <script>
+    // Initial random seed
+    function randomizeSeed() {
+      document.getElementById('seedInput').value = Math.floor(Math.random() * 900000) + 100000;
+    }
+    randomizeSeed();
+
+    function generateHorrorScene() {
+      const seed = document.getElementById('seedInput').value || 123456;
+      const charFeatures = document.getElementById('characterFeatures').value.trim();
+      const sceneAction = document.getElementById('scenePrompt').value.trim();
+      const ratio = document.getElementById('aspectRatio').value;
+
+      if (!sceneAction && !charFeatures) {
+        return alert("Kripya Scene ya Character ka description likhein.");
+      }
+
+      // Pre-set Dark Horror Anime Style Prompt
+      const stylePreset = "dark horror anime style, 2d animation aesthetic, eerie atmosphere, Junji Ito inspired, terrifying shadows, cinematic horror lighting, highly detailed line art, masterpiece";
+      
+      const fullPrompt = `${charFeatures}, ${sceneAction}, ${stylePreset}`;
+      
+      let width = 1280;
+      let height = 720;
+
+      if (ratio === "9:16") {
+        width = 720;
+        height = 1280;
+      } else if (ratio === "1:1") {
+        width = 1024;
+        height = 1024;
+      }
+
+      const previewArea = document.getElementById('preview-area');
+      const img = document.getElementById('generatedImage');
+      const loading = document.getElementById('loading');
+      const downloadLink = document.getElementById('downloadLink');
+
+      previewArea.style.display = "flex";
+      loading.style.display = "block";
+      img.style.display = "none";
+      downloadLink.style.display = "none";
+
+      // Direct free Pollinations engine with locked seed
+      const encodedPrompt = encodeURIComponent(fullPrompt);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=flux`;
+
+      const tempImg = new Image();
+      tempImg.src = imageUrl;
+
+      tempImg.onload = () => {
+        img.src = imageUrl;
+        downloadLink.href = imageUrl;
+        loading.style.display = "none";
+        img.style.display = "block";
+        downloadLink.style.display = "inline-block";
+      };
+
+      tempImg.onerror = () => {
+        loading.innerText = "Error aaya, kripya dobara generate dabayein.";
+      };
+    }
+  </script>
+</body>
+</html>
