@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Horror Anime Studio</title>
+  <title>Horror Anime Studio Pro</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0c0c0e; color: #fff; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
+    body { background: #0b0b0e; color: #fff; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
     header { text-align: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #222; }
     h1 { font-size: 20px; color: #ff3333; text-transform: uppercase; letter-spacing: 1px; }
     p.sub { font-size: 11px; color: #888; margin-top: 3px; }
     
-    .card { background: #16161a; border-radius: 12px; padding: 14px; border: 1px solid #282830; margin-bottom: 15px; }
+    .card { background: #141418; border-radius: 12px; padding: 14px; border: 1px solid #25252e; margin-bottom: 15px; }
     label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #bbb; text-transform: uppercase; }
     
     input, textarea, select {
       width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
-      background: #202026; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
+      background: #1c1c24; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
     }
     textarea { resize: vertical; min-height: 75px; }
     
@@ -29,45 +29,45 @@
       cursor: pointer; transition: 0.2s;
     }
     button:active { background: #cc1111; }
-    button.sec-btn { background: #2c2c34; padding: 10px; font-size: 12px; margin-top: -6px; margin-bottom: 12px; }
+    button.sec-btn { background: #282832; padding: 10px; font-size: 12px; margin-top: -6px; margin-bottom: 12px; }
 
     #preview-area {
       display: none; flex-direction: column; align-items: center; justify-content: center;
-      background: #16161a; border-radius: 12px; padding: 15px; border: 1px solid #282830; text-align: center;
+      background: #141418; border-radius: 12px; padding: 15px; border: 1px solid #25252e; text-align: center;
     }
     #generatedImage {
-      width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #3a3a44; margin-bottom: 12px;
+      width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.8);
     }
     .loading-spinner { font-size: 13px; color: #ff9900; margin: 15px 0; font-weight: 500; }
     .download-btn {
-      background: #007aff; text-decoration: none; color: #fff; padding: 11px 20px;
-      border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block;
+      background: #007aff; text-decoration: none; color: #fff; padding: 12px 24px;
+      border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; cursor: pointer;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Horror Anime Studio</h1>
-    <p class="sub">2D Dark Anime Generator (YouTube Horror Stories)</p>
+    <h1>Horror Anime Studio Pro</h1>
+    <p class="sub">2D Dark Horror Anime Generator for YouTube Stories</p>
   </header>
 
   <div class="card">
-    <label>1. Face Lock / Identity Seed</label>
+    <label>1. Face Lock / Seed Number</label>
     <div class="row">
-      <input type="number" id="seedInput" placeholder="Seed (e.g. 48291)" class="col">
+      <input type="number" id="seedInput" placeholder="Character Seed (Jaise: 12345)" class="col">
       <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
     </div>
     <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px; font-size: 11px;">
-      Same character ke liye number wahi rakhein. Naye bhoot/character ke liye 'New Face' dabayein.
+      Same character ke liye number wahi rakhein. Naya bhoot/character chahiye toh 'New Face' dabayein.
     </small>
 
     <label>2. Character (Optional)</label>
     <input type="text" id="characterFeatures" placeholder="e.g. young anime boy, black messy hair, pale skin (Khali chhod sakte hain)">
 
     <label>3. Scene / Ghost / Background</label>
-    <textarea id="scenePrompt" placeholder="e.g. scary ghost woman in white saree floating in dark haunted forest, red eyes, fog"></textarea>
+    <textarea id="scenePrompt" placeholder="e.g. terrifying shadow monster behind a door, dark hallway, red moonlight, eerie fog"></textarea>
 
     <div class="row">
       <div class="col">
@@ -80,13 +80,14 @@
       </div>
     </div>
 
-    <button id="genBtn" onclick="generateScene()">⚡ Generate Horror Scene</button>
+    <button id="genBtn" onclick="generateScene()">⚡ Generate Scene</button>
   </div>
 
   <div id="preview-area">
     <div id="loading" class="loading-spinner">Generating 2D Horror Scene... Kripya 10-15 second intezar karein.</div>
     <img id="generatedImage" src="" alt="Horror Scene" style="display:none;">
-    <a id="downloadLink" href="#" download="horror_anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
+    <br>
+    <a id="downloadLink" href="#" download="horror_anime.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
   </div>
 
   <script>
@@ -105,15 +106,8 @@
         return alert("Kripya Scene ya Bhoot/Character ka description likhein.");
       }
 
-      // Hardcore 2D Horror Anime Preset (Junji Ito + Retro 90s horror anime)
-      const animePreset = "2D dark anime horror style, hand drawn cel shading, retro 90s dark anime screenshot, creepy terrifying atmosphere, dark shadows, masterpiece, high quality illustration";
-      
-      let fullPrompt = "";
-      if (charFeatures) {
-        fullPrompt = `${charFeatures}, ${sceneAction}, ${animePreset}`;
-      } else {
-        fullPrompt = `${sceneAction}, ${animePreset}`;
-      }
+      const animeStyle = "masterpiece, 2D dark anime style, retro 90s horror anime aesthetic, inked lineart, creepy shadows, bloodcurdling atmosphere, flat cel shading";
+      let fullPrompt = charFeatures ? `${charFeatures}, ${sceneAction}, ${animeStyle}` : `${sceneAction}, ${animeStyle}`;
 
       let width = 1024;
       let height = 576;
@@ -136,32 +130,41 @@
       img.style.display = "none";
       downloadLink.style.display = "none";
 
-      const cleanPrompt = encodeURIComponent(fullPrompt);
+      const encodedPrompt = encodeURIComponent(fullPrompt);
 
-      // Stable Diffusion anime unmetered direct render
-      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&enhance=false&model=midjourney&_t=${Date.now()}`;
+      // Multi-engine fallback: Agar ek server busy ho toh dusra bina error ke turant image load karega
+      const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=turbo&nofeed=true&_cache=${Date.now()}`;
+      const secondaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=deliberate&_cache=${Date.now()}`;
 
-      const tempImg = new Image();
-      tempImg.crossOrigin = "anonymous";
-      tempImg.src = imageUrl;
-
-      tempImg.onload = () => {
-        img.src = imageUrl;
-        downloadLink.href = imageUrl;
-        loading.style.display = "none";
-        img.style.display = "block";
-        downloadLink.style.display = "inline-block";
-      };
-
-      tempImg.onerror = () => {
-        // Fallback route agar pehla server slow ho
-        const fallbackUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&_t=${Date.now()}`;
-        img.src = fallbackUrl;
-        downloadLink.href = fallbackUrl;
-        loading.style.display = "none";
-        img.style.display = "block";
-        downloadLink.style.display = "inline-block";
-      };
+      fetch(primaryUrl)
+        .then(response => {
+          if (!response.ok) throw new Error("Busy");
+          return response.blob();
+        })
+        .then(blob => {
+          const objectUrl = URL.createObjectURL(blob);
+          img.src = objectUrl;
+          downloadLink.href = objectUrl;
+          loading.style.display = "none";
+          img.style.display = "block";
+          downloadLink.style.display = "inline-block";
+        })
+        .catch(() => {
+          // Fallback to secondary fast server
+          fetch(secondaryUrl)
+            .then(res => res.blob())
+            .then(b => {
+              const objectUrl = URL.createObjectURL(b);
+              img.src = objectUrl;
+              downloadLink.href = objectUrl;
+              loading.style.display = "none";
+              img.style.display = "block";
+              downloadLink.style.display = "inline-block";
+            })
+            .catch(() => {
+              loading.innerText = "Server busy hai, 5 second baad dobara 'Generate' dabayein.";
+            });
+        });
     }
   </script>
 </body>
