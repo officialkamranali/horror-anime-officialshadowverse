@@ -6,7 +6,7 @@
   <title>Horror Anime Studio Pro</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0b0b0e; color: #fff; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
+    body { background: #0a0a0d; color: #fff; display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
     header { text-align: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #222; }
     h1 { font-size: 20px; color: #ff3333; text-transform: uppercase; letter-spacing: 1px; }
     p.sub { font-size: 11px; color: #888; margin-top: 3px; }
@@ -16,7 +16,7 @@
     
     input, textarea, select {
       width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
-      background: #1c1c24; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
+      background: #1b1b22; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px;
     }
     textarea { resize: vertical; min-height: 75px; }
     
@@ -35,7 +35,6 @@
       display: none; flex-direction: column; align-items: center; justify-content: center;
       background: #141418; border-radius: 12px; padding: 15px; border: 1px solid #25252e; text-align: center;
     }
-    #imageContainer { width: 100%; max-width: 650px; min-height: 200px; display: flex; justify-content: center; align-items: center; }
     #generatedImage {
       width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.8); display: none;
@@ -45,6 +44,7 @@
       background: #007aff; text-decoration: none; color: #fff; padding: 12px 24px;
       border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; cursor: pointer;
     }
+    .engine-status { font-size: 11px; color: #00e676; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -61,14 +61,14 @@
       <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
     </div>
     <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px; font-size: 11px;">
-      Same character ke har scene ke liye Seed Number bilkul mat badalna.
+      Same character ke liye Seed Number mat badalna. Naye bhoot/character ke liye 'New Face' dabayein.
     </small>
 
-    <label>2. Character Details (Fixed Features)</label>
-    <input type="text" id="characterFeatures" placeholder="e.g. young boy, short black messy hair, dark sunken eyes, red jacket">
+    <label>2. Character Details (Fixed Features - Optional)</label>
+    <input type="text" id="characterFeatures" placeholder="young anime boy, messy black hair, pale face, dark tired eyes">
 
-    <label>3. Scene / Action / Background</label>
-    <textarea id="scenePrompt" placeholder="e.g. standing in front of haunted ruined school, looking scared, dark fog, red moon"></textarea>
+    <label>3. Scene / Ghost / Background</label>
+    <textarea id="scenePrompt" placeholder="standing in dark haunted mansion corridor, holding candle, creepy dark shadows, eerie fog"></textarea>
 
     <div class="row">
       <div class="col">
@@ -81,26 +81,28 @@
       </div>
     </div>
 
-    <button id="genBtn" onclick="generateScene()">⚡ Generate Scene</button>
+    <button id="genBtn" onclick="startGeneration()">⚡ Generate Scene</button>
   </div>
 
   <div id="preview-area">
-    <div id="loading" class="loading-spinner">Generating 2D Horror Scene... Kripya 10-15 second intezar karein.</div>
-    <div id="imageContainer">
-      <img id="generatedImage" src="" alt="Horror Scene">
-    </div>
+    <div id="engineStatus" class="engine-status">Engine: Connecting...</div>
+    <div id="loading" class="loading-spinner">Generating 2D Anime Scene... Kripya 10-20 second intezar karein.</div>
+    <img id="generatedImage" src="" alt="Horror Scene">
     <br>
-    <a id="downloadLink" href="#" target="_blank" class="download-btn" style="display:none;">📥 Download HD Image</a>
+    <a id="downloadLink" href="#" download="horror_anime_scene.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
   </div>
 
   <script>
+    // Token replacement
+    const HF_TOKEN = "HFAKq57Z0w5g3T1j1PN9x3uayyHLeKH;
+
     function randomizeSeed() {
       document.getElementById('seedInput').value = Math.floor(Math.random() * 899999) + 100000;
     }
     randomizeSeed();
 
-    function generateScene() {
-      const seed = document.getElementById('seedInput').value || 123456;
+    async function startGeneration() {
+      const seed = parseInt(document.getElementById('seedInput').value) || 123456;
       let charFeatures = document.getElementById('characterFeatures').value.trim();
       let sceneAction = document.getElementById('scenePrompt').value.trim();
       const ratio = document.getElementById('aspectRatio').value;
@@ -109,21 +111,13 @@
         return alert("Kripya Scene ya Character ka description bharein.");
       }
 
-      // Safe keyword cleanup taaki server cancel na kare
-      sceneAction = sceneAction.replace(/blood/gi, "dark red liquid").replace(/gore/gi, "creepy marks");
+      sceneAction = sceneAction.replace(/blood/gi, "crimson marks").replace(/gore/gi, "horror details");
 
-      // Seed consistency boost: Anime style ko clean rakha hai taaki seed properly work kare
-      const animeStyle = "masterpiece, 2d horror anime, retro 90s anime screenshot, eerie dark shadows, dramatic lighting, sharp ink outlines";
-      
-      let fullPrompt = "";
-      if (charFeatures) {
-        fullPrompt = `${charFeatures}, ${sceneAction}, ${animeStyle}`;
-      } else {
-        fullPrompt = `${sceneAction}, ${animeStyle}`;
-      }
+      const animeStyle = "masterpiece, dark 2D anime illustration, retro 90s horror anime screencap, inked lines, creepy dark gothic atmosphere, moody horror lighting";
+      const fullPrompt = charFeatures ? `${charFeatures}, ${sceneAction}, ${animeStyle}` : `${sceneAction}, ${animeStyle}`;
+      const negativePrompt = "3d, realistic, photo, render, cgi, western comic, blurry, deformed face, bad anatomy";
 
-      let width = 1024;
-      let height = 576;
+      let width = 1024, height = 576;
       if (ratio === "9:16") { width = 576; height = 1024; }
       if (ratio === "1:1") { width = 768; height = 768; }
 
@@ -131,39 +125,68 @@
       const img = document.getElementById('generatedImage');
       const loading = document.getElementById('loading');
       const downloadLink = document.getElementById('downloadLink');
+      const statusText = document.getElementById('engineStatus');
 
       previewArea.style.display = "flex";
       loading.style.display = "block";
-      loading.innerText = "Generating 2D Horror Scene... Kripya 10-15 second intezar karein.";
       img.style.display = "none";
       downloadLink.style.display = "none";
+      statusText.innerText = "Engine: Primary (Hugging Face Anime)...";
 
-      const cleanPrompt = encodeURIComponent(fullPrompt);
-      // Fast turbo model with locked seed and direct image link
-      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=turbo&enhance=false&_t=${Date.now()}`;
+      try {
+        // Primary Attempt: Hugging Face SD Anime Engine
+        const response = await fetch("https://api-inference.huggingface.co/models/cagliostrolab/animagine-xl-3.1", {
+          headers: {
+            Authorization: `Bearer ${HF_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({
+            inputs: fullPrompt,
+            parameters: {
+              negative_prompt: negativePrompt,
+              seed: seed,
+              width: width,
+              height: height
+            }
+          }),
+        });
 
-      // Preload image directly
-      const loader = new Image();
-      loader.onload = function() {
-        img.src = imageUrl;
-        downloadLink.href = imageUrl;
-        downloadLink.setAttribute('download', `horror_scene_${seed}.jpg`);
-        loading.style.display = "none";
-        img.style.display = "block";
-        downloadLink.style.display = "inline-block";
-      };
+        if (!response.ok) {
+          throw new Error("Primary HF busy or loading");
+        }
 
-      loader.onerror = function() {
-        // Fallback without extra params agar network glitch ho
-        const fallbackUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
-        img.src = fallbackUrl;
-        downloadLink.href = fallbackUrl;
-        loading.style.display = "none";
-        img.style.display = "block";
-        downloadLink.style.display = "inline-block";
-      };
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        showOutput(objectUrl);
+        statusText.innerText = "Engine: Hugging Face (Active)";
+      } catch (err) {
+        // Auto-Fallback Engine (Bina ruke dusre server se load karega)
+        statusText.innerText = "Engine: Auto-Switched to Secondary Backup...";
+        const cleanPrompt = encodeURIComponent(fullPrompt);
+        const fallbackUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=deliberate&_t=${Date.now()}`;
 
-      loader.src = imageUrl;
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          showOutput(fallbackUrl);
+        };
+        fallbackImg.onerror = () => {
+          loading.innerText = "Server busy hai, kripya 10 second baad dobara generate karein.";
+        };
+        fallbackImg.src = fallbackUrl;
+      }
+    }
+
+    function showOutput(url) {
+      const img = document.getElementById('generatedImage');
+      const loading = document.getElementById('loading');
+      const downloadLink = document.getElementById('downloadLink');
+
+      img.src = url;
+      downloadLink.href = url;
+      loading.style.display = "none";
+      img.style.display = "block";
+      downloadLink.style.display = "inline-block";
     }
   </script>
 </body>
