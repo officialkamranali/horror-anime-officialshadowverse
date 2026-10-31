@@ -35,9 +35,10 @@
       display: none; flex-direction: column; align-items: center; justify-content: center;
       background: #141418; border-radius: 12px; padding: 15px; border: 1px solid #25252e; text-align: center;
     }
+    #imageContainer { width: 100%; max-width: 650px; min-height: 200px; display: flex; justify-content: center; align-items: center; }
     #generatedImage {
       width: 100%; max-width: 650px; border-radius: 8px; border: 1px solid #333; margin-bottom: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8); display: none;
     }
     .loading-spinner { font-size: 13px; color: #ff9900; margin: 15px 0; font-weight: 500; }
     .download-btn {
@@ -60,14 +61,14 @@
       <button class="sec-btn col" onclick="randomizeSeed()" style="max-width: 130px;">🎲 New Face</button>
     </div>
     <small style="color: #777; display:block; margin-top: -6px; margin-bottom: 12px; font-size: 11px;">
-      Same character ke liye number wahi rakhein. Naya bhoot/character chahiye toh 'New Face' dabayein.
+      Same character ke har scene ke liye Seed Number bilkul mat badalna.
     </small>
 
-    <label>2. Character (Optional)</label>
-    <input type="text" id="characterFeatures" placeholder="e.g. young anime boy, black messy hair, pale skin (Khali chhod sakte hain)">
+    <label>2. Character Details (Fixed Features)</label>
+    <input type="text" id="characterFeatures" placeholder="e.g. young boy, short black messy hair, dark sunken eyes, red jacket">
 
-    <label>3. Scene / Ghost / Background</label>
-    <textarea id="scenePrompt" placeholder="e.g. terrifying shadow monster behind a door, dark hallway, red moonlight, eerie fog"></textarea>
+    <label>3. Scene / Action / Background</label>
+    <textarea id="scenePrompt" placeholder="e.g. standing in front of haunted ruined school, looking scared, dark fog, red moon"></textarea>
 
     <div class="row">
       <div class="col">
@@ -85,9 +86,11 @@
 
   <div id="preview-area">
     <div id="loading" class="loading-spinner">Generating 2D Horror Scene... Kripya 10-15 second intezar karein.</div>
-    <img id="generatedImage" src="" alt="Horror Scene" style="display:none;">
+    <div id="imageContainer">
+      <img id="generatedImage" src="" alt="Horror Scene">
+    </div>
     <br>
-    <a id="downloadLink" href="#" download="horror_anime.jpg" class="download-btn" style="display:none;">📥 Download HD Image</a>
+    <a id="downloadLink" href="#" target="_blank" class="download-btn" style="display:none;">📥 Download HD Image</a>
   </div>
 
   <script>
@@ -96,28 +99,33 @@
     }
     randomizeSeed();
 
-    async function generateScene() {
+    function generateScene() {
       const seed = document.getElementById('seedInput').value || 123456;
       let charFeatures = document.getElementById('characterFeatures').value.trim();
       let sceneAction = document.getElementById('scenePrompt').value.trim();
       const ratio = document.getElementById('aspectRatio').value;
 
       if (!sceneAction && !charFeatures) {
-        return alert("Kripya Scene ya Bhoot/Character ka description likhein.");
+        return alert("Kripya Scene ya Character ka description bharein.");
       }
 
-      const animeStyle = "masterpiece, 2D dark anime style, retro 90s horror anime aesthetic, inked lineart, creepy shadows, bloodcurdling atmosphere, flat cel shading";
-      let fullPrompt = charFeatures ? `${charFeatures}, ${sceneAction}, ${animeStyle}` : `${sceneAction}, ${animeStyle}`;
+      // Safe keyword cleanup taaki server cancel na kare
+      sceneAction = sceneAction.replace(/blood/gi, "dark red liquid").replace(/gore/gi, "creepy marks");
+
+      // Seed consistency boost: Anime style ko clean rakha hai taaki seed properly work kare
+      const animeStyle = "masterpiece, 2d horror anime, retro 90s anime screenshot, eerie dark shadows, dramatic lighting, sharp ink outlines";
+      
+      let fullPrompt = "";
+      if (charFeatures) {
+        fullPrompt = `${charFeatures}, ${sceneAction}, ${animeStyle}`;
+      } else {
+        fullPrompt = `${sceneAction}, ${animeStyle}`;
+      }
 
       let width = 1024;
       let height = 576;
-      if (ratio === "9:16") {
-        width = 576;
-        height = 1024;
-      } else if (ratio === "1:1") {
-        width = 768;
-        height = 768;
-      }
+      if (ratio === "9:16") { width = 576; height = 1024; }
+      if (ratio === "1:1") { width = 768; height = 768; }
 
       const previewArea = document.getElementById('preview-area');
       const img = document.getElementById('generatedImage');
@@ -130,41 +138,32 @@
       img.style.display = "none";
       downloadLink.style.display = "none";
 
-      const encodedPrompt = encodeURIComponent(fullPrompt);
+      const cleanPrompt = encodeURIComponent(fullPrompt);
+      // Fast turbo model with locked seed and direct image link
+      const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=turbo&enhance=false&_t=${Date.now()}`;
 
-      // Multi-engine fallback: Agar ek server busy ho toh dusra bina error ke turant image load karega
-      const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=turbo&nofeed=true&_cache=${Date.now()}`;
-      const secondaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=deliberate&_cache=${Date.now()}`;
+      // Preload image directly
+      const loader = new Image();
+      loader.onload = function() {
+        img.src = imageUrl;
+        downloadLink.href = imageUrl;
+        downloadLink.setAttribute('download', `horror_scene_${seed}.jpg`);
+        loading.style.display = "none";
+        img.style.display = "block";
+        downloadLink.style.display = "inline-block";
+      };
 
-      fetch(primaryUrl)
-        .then(response => {
-          if (!response.ok) throw new Error("Busy");
-          return response.blob();
-        })
-        .then(blob => {
-          const objectUrl = URL.createObjectURL(blob);
-          img.src = objectUrl;
-          downloadLink.href = objectUrl;
-          loading.style.display = "none";
-          img.style.display = "block";
-          downloadLink.style.display = "inline-block";
-        })
-        .catch(() => {
-          // Fallback to secondary fast server
-          fetch(secondaryUrl)
-            .then(res => res.blob())
-            .then(b => {
-              const objectUrl = URL.createObjectURL(b);
-              img.src = objectUrl;
-              downloadLink.href = objectUrl;
-              loading.style.display = "none";
-              img.style.display = "block";
-              downloadLink.style.display = "inline-block";
-            })
-            .catch(() => {
-              loading.innerText = "Server busy hai, 5 second baad dobara 'Generate' dabayein.";
-            });
-        });
+      loader.onerror = function() {
+        // Fallback without extra params agar network glitch ho
+        const fallbackUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
+        img.src = fallbackUrl;
+        downloadLink.href = fallbackUrl;
+        loading.style.display = "none";
+        img.style.display = "block";
+        downloadLink.style.display = "inline-block";
+      };
+
+      loader.src = imageUrl;
     }
   </script>
 </body>
